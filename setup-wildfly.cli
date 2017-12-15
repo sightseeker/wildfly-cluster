@@ -1,6 +1,9 @@
 embed-server --server-config=standalone-full-ha.xml
 batch
 
+# Configure Messaging Subsystem
+/subsystem=messaging-activemq/server=default/pooled-connection-factory=activemq-ra:write-attribute(name=rebalance-connections, value=true)
+
 # Configure Infinispan
 /socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-infinispan-server:add(host=infinispan, port=11222)
 /subsystem=infinispan/cache-container=web/replicated-cache=repl:add(mode="SYNC", remote-timeout=330000)
