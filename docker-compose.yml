@@ -1,0 +1,29 @@
+version: '3'
+services:
+  wildfly:
+    build: .
+    image: sightseeker/wildfly-cluster:10.1.0.Final
+    ports:
+      - 8080:8080
+    networks:
+      app_net:
+        ipv4_address: 10.0.1.10
+    deploy:
+      replicas: 2
+  infinispan:
+    image: jboss/infinispan-server:9.1.0.Final-2
+    ports:
+      - 19990:9990
+    command: ["-Djboss.default.jgroups.stack=tcp", "-mu", "admin", "-mp", "password"]
+    deploy:
+      replicas: 2
+    networks:
+      - app_net
+networks:
+  app_net:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+
+
+#  docker run -it jboss/infinispan-server -Djboss.default.jgroups.stack=tcp-gossip -Djgroups.gossip.initial_hosts=172.17.0.2[12001]

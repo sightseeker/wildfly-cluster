@@ -1,0 +1,19 @@
+embed-server --server-config=standalone-full-ha.xml
+batch
+
+# Configure Infinispan
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-infinispan-server:add(host=infinispan, port=11222)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl:add(mode="SYNC", remote-timeout=330000)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:add(remote-servers=["remote-infinispan-server"])
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=cache,value=default)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=socket-timeout, value=60000)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=tcp-no-delay, value=true)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=fetch-state, value=false)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=passivation, value=false)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=preload, value=false)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=purge, value=false)
+/subsystem=infinispan/cache-container=web/replicated-cache=repl/store=remote:write-attribute(name=shared, value=true)
+/subsystem=infinispan/cache-container=web:write-attribute(name=default-cache, value="repl")
+
+run-batch
+stop-embedded-server
